@@ -13,7 +13,7 @@ export class CrawlerService {
 
   constructor(private prisma: PrismaService) {}
 
-  // @Cron('0 0/30 * * * *')
+  @Cron('0 50 6 * * *')
   async doCrawling() {
     const crawlers = await this.prisma.crawler.findMany({
       where: {
