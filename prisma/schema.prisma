@@ -1,0 +1,106 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model News {
+  id              Int         @id @default(autoincrement())
+  title           String
+  content         String
+  contentMd5      String      @unique
+  sourceUrl       String
+  disabled        Boolean     @default(false)
+  publishDateTime DateTime
+  remark          String?
+  priority        Int?
+  nature          NewsNature?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+model Crawler {
+  id           Int           @id @default(autoincrement())
+  cmdPrefix    String
+  scriptPath   String
+  language     Language
+  disabled     Boolean       @default(false)
+  remark       String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  crawlResults CrawlResult[]
+}
+
+model CrawlResult {
+  id          Int      @id @default(autoincrement())
+  crawler     Crawler  @relation(fields: [crawlerId], references: [id])
+  crawlerId   Int
+  successFlag Boolean
+  message     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model LLMChatResult {
+  id             Int      @id @default(autoincrement())
+  newsIds        String
+  completionBody String
+  message        String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model PushSchedule {
+  id          Int          @id @default(autoincrement())
+  cron        String
+  messageType MessageType
+  channel     PushChannel
+  to          String
+  disabled    Boolean      @default(false)
+  remark      String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  pushResults PushResult[]
+}
+
+model PushResult {
+  id         Int          @id @default(autoincrement())
+  schedule   PushSchedule @relation(fields: [scheduleId], references: [id])
+  scheduleId Int
+  content    String
+  to         String
+  resultCode Int
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+}
+
+model Config {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique
+  val       String
+  remark    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Language {
+  PY
+  JS
+}
+
+enum NewsNature {
+  DOM
+  INTL
+}
+
+enum MessageType {
+  NEWS
+}
+
+enum PushChannel {
+  WE_CHAT
+}
