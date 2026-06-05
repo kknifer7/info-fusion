@@ -19,8 +19,8 @@ model News {
   remark          String?
   priority        Int?
   nature          NewsNature?
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  createdAt       DateTime?   @default(now())
+  updatedAt       DateTime?   @updatedAt
 }
 
 model Crawler {
@@ -28,30 +28,31 @@ model Crawler {
   cmdPrefix    String
   scriptPath   String
   language     Language
+  cron         String        @default("0 10 6 * * *")
   disabled     Boolean       @default(false)
   remark       String?
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  createdAt    DateTime?     @default(now())
+  updatedAt    DateTime?     @updatedAt
   crawlResults CrawlResult[]
 }
 
 model CrawlResult {
-  id          Int      @id @default(autoincrement())
-  crawler     Crawler  @relation(fields: [crawlerId], references: [id])
+  id          Int       @id @default(autoincrement())
+  crawler     Crawler   @relation(fields: [crawlerId], references: [id])
   crawlerId   Int
   successFlag Boolean
   message     String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime? @default(now())
+  updatedAt   DateTime? @updatedAt
 }
 
 model LLMChatResult {
-  id             Int      @id @default(autoincrement())
+  id             Int       @id @default(autoincrement())
   newsIds        String
   completionBody String
   message        String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt      DateTime? @default(now())
+  updatedAt      DateTime? @updatedAt
 }
 
 model PushSchedule {
@@ -62,8 +63,8 @@ model PushSchedule {
   to          String
   disabled    Boolean      @default(false)
   remark      String?
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  createdAt   DateTime?    @default(now())
+  updatedAt   DateTime?    @updatedAt
   pushResults PushResult[]
 }
 
@@ -74,17 +75,17 @@ model PushResult {
   content    String
   to         String
   resultCode Int
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
+  createdAt  DateTime?    @default(now())
+  updatedAt  DateTime?    @updatedAt
 }
 
 model Config {
-  id        Int      @id @default(autoincrement())
-  key       String   @unique
+  id        Int       @id @default(autoincrement())
+  key       String    @unique
   val       String
   remark    String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
 }
 
 enum Language {
