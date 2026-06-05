@@ -71,7 +71,8 @@ HEADERS = {
 class NewsItem:
     title: str
     url: str
-    pub_time: str
+    pub_time: str  # e.g. "15:39"
+    group_title: str  # e.g. "今天", "昨天", "6月4日"
 
 
 def today_in_timezone(tz_name: str) -> date:
@@ -80,6 +81,34 @@ def today_in_timezone(tz_name: str) -> date:
     except ImportError as exc:
         raise RuntimeError("Python 3.9+ is required for zoneinfo timezone support.") from exc
     return datetime.now(ZoneInfo(tz_name)).date()
+
+
+def _resolve_date(group_title: str, reference_date: date) -> date:
+    """Parse groupTitle into a concrete date."""
+    if group_title in ("今日", "\u4eca\u65e5"):
+        return reference_date
+    if group_title in ("昨日", "\u6628\u65e5"):
+        return reference_date - __import__("datetime").timedelta(days=1)
+    # e.g. "6月4日"
+    m = re.match(r"(\d{1,2})\u6708(\d{1,2})\u65e5", group_title)
+    if m:
+        return date(reference_date.year, int(m.group(1)), int(m.group(2)))
+    # e.g. "2025年6月4日"
+    m = re.match(r"(\d{4})\u5e74(\d{1,2})\u6708(\d{1,2})\u65e5", group_title)
+    if m:
+        return date(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+    # Fallback
+    return reference_date
+
+
+def _build_publish_dt(group_title: str, sub_time: str, reference_date: date) -> str:
+    """Combine groupTitle date + subGroupTitle time into 'YYYY-MM-DD HH:MM:00'."""
+    date_obj = _resolve_date(group_title, reference_date)
+    # sub_time is like "15:39"
+    time_match = re.match(r"(\d{1,2}):(\d{2})", sub_time)
+    if time_match:
+        return f"{date_obj.isoformat()} {time_match.group(1).zfill(2)}:{time_match.group(2)}:00"
+    return f"{date_obj.isoformat()} 00:00:00"
 
 
 def fetch_list() -> list[NewsItem]:
@@ -100,11 +129,12 @@ def fetch_list() -> list[NewsItem]:
     for raw in raw_list:
         title = raw.get("title", "").strip()
         url_path = raw.get("url", "").strip()
-        pub_time = raw.get("subGroupTitle", "").strip()  # e.g. "14:18"
+        pub_time = raw.get("subGroupTitle", "").strip()  # e.g. "15:39"
+        group_title = raw.get("groupTitle", "").strip()  # e.g. "今天"
         if not title:
             continue
         url = f"https://www.sohu.com{url_path}" if url_path else ""
-        items.append(NewsItem(title=title, url=url, pub_time=pub_time))
+        items.append(NewsItem(title=title, url=url, pub_time=pub_time, group_title=group_title))
 
     return items
 
@@ -129,8 +159,7 @@ def main() -> int:
     message = ""
 
     try:
-        target = today_in_timezone(DEFAULT_TIMEZONE)
-        publish_dt = f"{target.isoformat()} 00:00"
+        reference = today_in_timezone(DEFAULT_TIMEZONE)
 
         items = fetch_list()
 
@@ -140,6 +169,7 @@ def main() -> int:
         ok_count = 0
         fail_count = 0
         for item in items:
+            publish_dt = _build_publish_dt(item.group_title, item.pub_time, reference)
             article_data = {
                 "title": item.title,
                 "content": item.title,
@@ -170,8 +200,7 @@ def main() -> int:
 
 def test_print() -> None:
     """测试模式：抓取并打印最终数据，不提交 API。"""
-    target = today_in_timezone(DEFAULT_TIMEZONE)
-    publish_dt = f"{target.isoformat()} 00:00"
+    reference = today_in_timezone(DEFAULT_TIMEZONE)
 
     items = fetch_list()
 
@@ -183,6 +212,7 @@ def test_print() -> None:
     print(f"[Test Mode] {len(items)} items would be submitted")
     print("=" * 60)
     for item in items:
+        publish_dt = _build_publish_dt(item.group_title, item.pub_time, reference)
         print(f"title: {item.title}")
         print(f"sourceUrl: {item.url}")
         print(f"publishDateTime: {publish_dt}")
