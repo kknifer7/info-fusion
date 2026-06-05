@@ -20,4 +20,4 @@ if [ -f /app/crawlers/requirements.txt ]; then
 fi
 
 # 启动应用
-exec node dist/src/main
+exec node dist/main
