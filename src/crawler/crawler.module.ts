@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { CrawlerService } from './crawler.service';
-import { PrismaModule } from 'src/prisma.module';
+import { PrismaModule } from '../prisma.module';
 
 @Module({
   imports: [PrismaModule],

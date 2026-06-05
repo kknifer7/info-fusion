@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { CrawlResultService } from './crawl-result.service';
 import { CrawlResultController } from './crawl-result.controller';
-import { PrismaModule } from 'src/prisma.module';
+import { PrismaModule } from '../prisma.module';
 
 @Module({
   controllers: [CrawlResultController],
