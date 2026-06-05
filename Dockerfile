@@ -28,8 +28,10 @@ RUN pnpm build
 # ==================== 生产阶段 ====================
 FROM docker.1ms.run/node:24-alpine AS production
 
-# 安装 pnpm 和 sqlite3（用于执行初始化 SQL）
-RUN apk add --no-cache sqlite \
+# 安装 pnpm、sqlite3、python3、pip 和时区数据
+RUN apk add --no-cache sqlite python3 py3-pip tzdata \
+  && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+  && echo "Asia/Shanghai" > /etc/timezone \
   && npm install -g pnpm@10.34.1
 
 WORKDIR /app
@@ -52,6 +54,7 @@ RUN chmod +x docker-entrypoint.sh
 # 设置环境变量
 ENV NODE_ENV=production
 ENV PORT=3000
+ENV TZ=Asia/Shanghai
 
 # 暴露端口
 EXPOSE 3000

@@ -15,8 +15,10 @@ services:
       # DEEPSEEK_API_KEY: your-api-key-here
       - NODE_ENV=production
     volumes:
-      # 持久化 SQLite 数据库文件（宿主机路径 : 容器内路径）
+      # 持久化 SQLite 数据库文件
       - ./data:/app/data
+      # 挂载爬虫脚本目录（宿主机放 .py 脚本和 requirements.txt）
+      - ./crawlers:/app/crawlers
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/"]
       interval: 30s

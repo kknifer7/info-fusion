@@ -12,5 +12,12 @@ if [ "$ROW_COUNT" -eq "0" ]; then
     echo "Initialization completed."
 fi
 
+# 安装爬虫的 Python 依赖（如果存在 requirements.txt）
+if [ -f /app/crawlers/requirements.txt ]; then
+    echo "Installing crawler dependencies..."
+    pip3 install -r /app/crawlers/requirements.txt --break-system-packages --quiet
+    echo "Crawler dependencies installed."
+fi
+
 # 启动应用
 exec node dist/src/main
