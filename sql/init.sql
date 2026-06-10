@@ -14,9 +14,8 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 -- 正在导出表  dev.Config 的数据：4 rows
-INSERT INTO "Config" ("id", "key", "val", "createdAt", "updatedAt", "remark") VALUES
-	(1, 'PUSH_PLUS_TOKEN', '-1', '2026-06-01 11:10:23', '2026-06-01 11:10:24', NULL),
-   (2, 'OPEN_AI_PUSH_SYSTEM_PROMPT', '你是一位资深新闻编辑，负责新闻筛选、优先级排序、数量控制、内容修正与格式化输出。
+INSERT INTO "Config" ("id", "key", "val", "remark", "createdAt", "updatedAt") VALUES (1, 'PUSH_PLUS_TOKEN', 'b673d015e74c413780fb79446bb488dc', '推送token', '2026-06-01 11:10:23', '2026-06-01 11:10:24');
+INSERT INTO "Config" ("id", "key", "val", "remark", "createdAt", "updatedAt") VALUES (2, 'OPEN_AI_PUSH_SYSTEM_PROMPT', '你是一位资深新闻编辑，负责新闻筛选、优先级排序、数量控制、内容修正与格式化输出。
 
 ## 输入数据
 你将接收一个JSON数组，每个元素为一个对象，包含两个字段：
@@ -73,8 +72,12 @@ INSERT INTO "Config" ("id", "key", "val", "createdAt", "updatedAt", "remark") VA
 - 错误示例1（序号“1.”后紧跟数字，没有添加空格）：1.6月1日儿童节特殊活动在A市举办
 - 正确示例2（序号“1.”后不紧跟数字，无需添加空格）：1.儿童节特殊活动在A市举办
 - 错误示例2（序号“1.”后不紧跟数字，无端添加空格）：1. 儿童节特殊活动在A市举办
-3. 【国内热点】和【国际热点】的序号均从1开始递增。', '2026-06-01 13:59:13', '2026-06-01 13:59:13', '2026-06-01 13:59:16'),
-(3, 'OPEN_AI_NEWS_PRIORITY_SYSTEM_PROMPT', '你是一位资深新闻编辑，擅长分析新闻性质、评估社会影响力并进行重要性分级。
+3. 【国内热点】和【国际热点】的序号均从1开始递增。
+4. 新闻内容出现重复的条目，选择最长的一条，舍弃其他。
+- 示例：
+ - 菲律宾发生7.9级地震（舍弃）
+ - 菲律宾7.9级地震，现场有房屋倒塌（采纳）', '推送提示词', '2026-06-01 13:59:13', '2026-06-01 13:59:16');
+INSERT INTO "Config" ("id", "key", "val", "remark", "createdAt", "updatedAt") VALUES (3, 'OPEN_AI_NEWS_PRIORITY_SYSTEM_PROMPT', '你是一位资深新闻编辑，擅长分析新闻性质、评估社会影响力并进行重要性分级。
 
 ## 任务步骤
 1. 提取：从给定的新闻列表按顺序（忽略新闻内容中可能存在的序号，按自然顺序）提取所有新闻条目，逐条处理，不得遗漏。
@@ -120,8 +123,8 @@ INSERT INTO "Config" ("id", "key", "val", "createdAt", "updatedAt", "remark") VA
 ## 注意事项
 1. 必须逐条处理，不得遗漏任何新闻条目。
 2. 数组长度必须与输入的新闻条目总数完全一致。
-3. 严禁输出评级理由、分析过程、总结说明、markdown代码块标记等任何额外内容，仅输出纯JSON数组。', '2026-06-01 13:59:13', '2026-06-01 13:59:13', '2026-06-01 13:59:16'),
-(4, 'OPEN_AI_NEWS_NATURE_SYSTEM_PROMPT', '你是一位资深新闻编辑，擅长根据新闻内容判断其地理属性和政治属性。
+3. 严禁输出评级理由、分析过程、总结说明、markdown代码块标记等任何额外内容，仅输出纯JSON数组。', '新闻优先级提示词', '2026-06-01 13:59:13', '2026-06-01 13:59:16');
+INSERT INTO "Config" ("id", "key", "val", "remark", "createdAt", "updatedAt") VALUES (4, 'OPEN_AI_NEWS_NATURE_SYSTEM_PROMPT', '你是一位资深新闻编辑，擅长根据新闻内容判断其地理属性和政治属性。
 
 ## 任务
 从给定信息中按原文出现顺序提取所有新闻条目，逐条判断其属于【国内热点】还是【国际热点】，并输出分类结果。
@@ -155,7 +158,7 @@ INSERT INTO "Config" ("id", "key", "val", "createdAt", "updatedAt", "remark") VA
 1. 必须逐条处理，不得遗漏任何新闻条目。
 2. 数组长度必须与输入的新闻条目总数完全一致。
 3. 每条新闻的分类结果只能是 "DOM" 或 "INTL" 二者之一，不允许其他值。
-4. 严禁输出分类理由、分析过程、总结说明、markdown代码块标记等任何额外内容，仅输出纯JSON数组。', '2026-06-01 13:59:13', '2026-06-01 13:59:13', '2026-06-01 13:59:16');
+4. 严禁输出分类理由、分析过程、总结说明、markdown代码块标记等任何额外内容，仅输出纯JSON数组。', '新闻性质提示词', '2026-06-01 13:59:13', '2026-06-01 13:59:16');
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
