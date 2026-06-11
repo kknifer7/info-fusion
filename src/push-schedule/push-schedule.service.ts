@@ -85,20 +85,33 @@ export class PushScheduleService {
   }
 
   private async chatForNewsList() {
-    const { gte: yesterdayStart } = getBeijingDayRange(-1);
+    const { gte: yesterdayStart, lt: yesterdayEnd } = getBeijingDayRange(-1);
     const { lt: tomorrow } = getBeijingDayRange(0);
 
     const newsList = await this.prisma.news.findMany({
       where: {
-        publishDateTime: {
-          gte: yesterdayStart,
-          lt: tomorrow,
-        },
         disabled: false,
         nature: NewsNature.DOM,
         priority: {
           gt: -1,
         },
+        OR: [
+          {
+            publishDateTime: {
+              gte: yesterdayStart,
+              lt: tomorrow,
+            },
+            NOT: {
+              remark: '腾讯新闻-三分钟新闻早知道',
+            },
+          },
+          {
+            publishDateTime: {
+              gt: yesterdayEnd,
+              lt: tomorrow,
+            },
+          },
+        ],
       },
       orderBy: {
         priority: 'desc',
@@ -107,15 +120,28 @@ export class PushScheduleService {
     });
     const intlNewsList = await this.prisma.news.findMany({
       where: {
-        publishDateTime: {
-          gte: yesterdayStart,
-          lt: tomorrow,
-        },
         disabled: false,
         nature: NewsNature.INTL,
         priority: {
           gte: -1,
         },
+        OR: [
+          {
+            publishDateTime: {
+              gte: yesterdayStart,
+              lt: tomorrow,
+            },
+            NOT: {
+              remark: '腾讯新闻-三分钟新闻早知道',
+            },
+          },
+          {
+            publishDateTime: {
+              gt: yesterdayEnd,
+              lt: tomorrow,
+            },
+          },
+        ],
       },
       orderBy: {
         priority: 'desc',
