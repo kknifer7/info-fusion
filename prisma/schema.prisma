@@ -19,6 +19,7 @@ model News {
   remark          String?
   priority        Int?
   nature          NewsNature?
+  newsType        NewsType    @default(Rolling)
   createdAt       DateTime?   @default(now())
   updatedAt       DateTime?   @updatedAt
 }
@@ -96,6 +97,11 @@ enum Language {
 enum NewsNature {
   DOM
   INTL
+}
+
+enum NewsType {
+  Paper // 简报新闻：一次爬取到的日期相同的一组新闻，这种新闻的日期不一定是其发布日期，因此在日期筛选上限制更加严格
+  Rolling // 滚动新闻：一次爬取到的日期各自不同的新闻，这种新闻可以按其发布时间进行筛选
 }
 
 enum MessageType {

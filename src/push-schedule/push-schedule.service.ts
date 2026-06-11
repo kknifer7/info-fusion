@@ -4,7 +4,11 @@ import { CronJob } from 'cron';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { PrismaService } from '../prisma.service';
-import { NewsNature, PushSchedule } from '../generated/prisma/browser';
+import {
+  NewsNature,
+  NewsType,
+  PushSchedule,
+} from '../generated/prisma/browser';
 import { deepEqual } from 'fast-equals';
 import { OpenAIService } from '../openai/openai.service';
 import { getBeijingDayRange } from '../utils/beijing-time';
@@ -101,15 +105,14 @@ export class PushScheduleService {
               gte: yesterdayStart,
               lt: tomorrow,
             },
-            NOT: {
-              remark: '腾讯新闻-三分钟新闻早知道',
-            },
+            newsType: NewsType.Rolling,
           },
           {
             publishDateTime: {
               gt: yesterdayEnd,
               lt: tomorrow,
             },
+            newsType: NewsType.Paper,
           },
         ],
       },
@@ -131,15 +134,14 @@ export class PushScheduleService {
               gte: yesterdayStart,
               lt: tomorrow,
             },
-            NOT: {
-              remark: '腾讯新闻-三分钟新闻早知道',
-            },
+            newsType: NewsType.Rolling,
           },
           {
             publishDateTime: {
               gt: yesterdayEnd,
               lt: tomorrow,
             },
+            newsType: NewsType.Paper,
           },
         ],
       },
