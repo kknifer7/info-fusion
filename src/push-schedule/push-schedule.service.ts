@@ -85,8 +85,8 @@ export class PushScheduleService {
   }
 
   private async chatForNewsList() {
-    const { lt: yesterdayStart } = getBeijingDayRange(-1);
-    const { gte: tomorrow } = getBeijingDayRange(0);
+    const { gte: yesterdayStart } = getBeijingDayRange(-1);
+    const { lt: tomorrow } = getBeijingDayRange(0);
 
     const newsList = await this.prisma.news.findMany({
       where: {
